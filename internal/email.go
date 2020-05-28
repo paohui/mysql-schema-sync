@@ -68,8 +68,19 @@ func (m *EmailStruct) SendMail(title string, body string) {
 	body = tableStyle + "\n" + body
 	body += "<br/><hr style='border:none;border-top:1px solid #ccc'/><center>Powered by <a href='" + AppURL + "'>mysql-schema-sync</a>&nbsp;" + Version + "</center>"
 
-	msgBody := fmt.Sprintf("To: %s\r\nContent-Type: text/html;charset=utf-8\r\nSubject: %s\r\n\r\n%s", strings.Join(sendTo, ";"), title, body)
-	err := smtp.SendMail(m.SMTPHost, auth, m.From, sendTo, []byte(msgBody))
+    header := make(map[string]string)
+    header["From"] = m.From
+    header["To"] = sendTo[0]
+    header["Subject"] = title
+    header["Content-Type"] = "text/html; charset=UTF-8"
+
+    message := ""
+    for k, v := range header {
+        message += fmt.Sprintf("%s: %s\r\n", k, v)
+    }
+	message += "\r\n" + body
+
+	err := smtp.SendMail(m.SMTPHost, auth, m.From, sendTo, []byte(message))
 	if err == nil {
 		log.Println("send mail success")
 	} else {
