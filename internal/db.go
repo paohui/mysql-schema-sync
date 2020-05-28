@@ -30,10 +30,10 @@ func NewMyDb(dsn string, dbType string) *MyDb {
 func (mydb *MyDb) GetTableNames() []string {
 	rs, err := mydb.Query("show table status")
 	if err != nil {
-	    defer rs.Close()
 		panic("show tables failed:" + err.Error())
 	}
-    defer rs.Close()
+	defer rs.Close()
+
 	var tables []string
 	columns, _ := rs.Columns()
 	for rs.Next() {
@@ -69,11 +69,9 @@ func (mydb *MyDb) GetTableSchema(name string) (schema string) {
 	rs, err := mydb.Query(fmt.Sprintf("show create table `%s`", name))
 	if err != nil {
 		log.Println(err)
-		 defer rs.Close()
 		return
 	}
-	 defer rs.Close()
-
+	defer rs.Close()
 	for rs.Next() {
 		var vname string
 		if err := rs.Scan(&vname, &schema); err != nil {
